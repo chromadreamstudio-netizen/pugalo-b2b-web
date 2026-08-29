@@ -44,7 +44,7 @@ export default function LeadModal({ isOpen, onClose, productName }: LeadModalPro
       if (error) throw error;
 
       // 2. إرسال البيانات عبر الجسر الداخلي الآمن
-      await fetch('/api/webhook', {
+      await fetch('/api/submit-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ record: leadPayload })
