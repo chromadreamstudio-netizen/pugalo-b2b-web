@@ -1,3 +1,4 @@
+'use function';
 'use client';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
@@ -12,8 +13,9 @@ export default function Home() {
   const currentLang = (lang as 'ar' | 'en' | 'tr') || 'ar';
 
   const productsData = t.products.map((prod: any) => {
-    let productColors = [];
-    let productImages = [];
+    // تم حل مشكلة TypeScript هنا بتحديد نوع المصفوفات بوضوح
+    let productColors = [] as any[];
+    let productImages = [] as string[];
     let productSizes = [] as string[];
 
     if (prod.id === 1) {
@@ -60,7 +62,6 @@ export default function Home() {
       productImages = [`/products/7/4.jpeg`, `/products/7/5.jpeg`, `/products/7/1.png`, `/products/7/2.png`, `/products/7/3.png`];
     }
     else if (prod.id === 8) {
-      // سرير دونات (تم تحديث المسارات لتطابق مجلدك)
       productColors = [
         { name: currentLang === 'ar' ? 'أنثراسيت' : currentLang === 'en' ? 'Anthracite' : 'Antrasit', hex: '#3b3e46' },
         { name: currentLang === 'ar' ? 'رمادي' : currentLang === 'en' ? 'Grey' : 'Gri', hex: '#9ca3af' },
