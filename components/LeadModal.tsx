@@ -36,21 +36,27 @@ export default function LeadModal({ isOpen, onClose, productName }: LeadModalPro
         status: 'new'
       };
 
-      // 1. إرسال البيانات إلى قاعدة بيانات Supabase
+      // 1. حفظ البيانات في قاعدة البيانات (الخطوة الأهم التي بناءً عليها يتحدد النجاح)
       const { error } = await supabase
         .from('b2b_leads')
         .insert([leadPayload]);
 
-      if (error) throw error;
+      // إذا فشل الحفظ في قاعدة البيانات، أوقف العملية هنا
+      if (error) throw error; 
 
-      // 2. إرسال البيانات عبر الجسر الداخلي الآمن
-      await fetch('/api/submit-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ record: leadPayload })
-      });
+      // 2. إرسال الإشعار لـ n8n في الخلفية بصمت (داخل try/catch منفصلة)
+      // حتى لو فشل الإشعار بسبب Vercel أو المتصفح، لن يتأثر العميل
+      try {
+        await fetch('/api/submit-lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ record: leadPayload })
+        });
+      } catch (notifyError) {
+        console.warn('تم حفظ الطلب، ولكن فشل إرسال الإشعار:', notifyError);
+      }
 
-      // نجاح الإرسال
+      // 3. إظهار رسالة النجاح للعميل فوراً لأن بياناته بأمان في Supabase
       setIsSuccess(true);
       setTimeout(() => {
         setIsSuccess(false);
@@ -58,9 +64,9 @@ export default function LeadModal({ isOpen, onClose, productName }: LeadModalPro
         onClose();
       }, 3000);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting lead:', error);
-      alert('حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.');
+      alert('تفاصيل الخطأ من قاعدة البيانات: ' + error.message);
     } finally {
       setIsSubmitting(false);
     }
