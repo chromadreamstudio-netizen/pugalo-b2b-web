@@ -43,8 +43,8 @@ export default function LeadModal({ isOpen, onClose, productName }: LeadModalPro
 
       if (error) throw error;
 
-      // 2. إرسال البيانات مباشرة إلى n8n لتصلك على تليجرام فوراً باستخدام الـ IP الصحيح
-      await fetch('http://178.105.30.59:5678/webhook/b0fcb367-0fea-4fdd-8f7e-689a95e07bd9', {
+      // 2. إرسال البيانات عبر الجسر الداخلي الآمن
+      await fetch('/api/webhook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ record: leadPayload })
